@@ -1,0 +1,189 @@
+﻿#Getting data from the Safe.txt file and 
+
+f = open("Safe.txt", "r")
+x = f.read()
+y = x.split('\n')
+w = ''
+for elem in y:
+    w = w + str(elem)
+k = w.split(' ')
+nomes = []
+data = []
+cidade = []
+fone = []
+cel = []
+fv = 0
+f.close()
+
+#filling the lists with the right information
+
+for z in range(len(k)):
+    if (k[z] == "Nome:"):
+        nomes.append(k[z+1] + " " + k[z+2] + " " + k[z+3] + " " + k[z+4] + " " + k[z+5])
+    if (k[z] == "Cadastro:"):
+        data.append(k[z+1])
+    if (k[z] == "Cidade:"):
+        cidade.append(k[z+1] + " " + k[z+2] + " " + k[z+3] + " " + k[z+4] + " " + k[z+5])
+    if (k[z] == "Fone:"):
+        if (fv == 0):
+            fone.append(k[z+1] + " " + k[z+2] + " " + k[z+3] + " " + k[z+4] + " " + k[z+5])
+            fv = 1
+        elif (fv == 1):
+            fv = 0
+    if (k[z] == "Cel:"):
+        cel.append(k[z+1] + " " + k[z+2] + " " + k[z+3] + " " + k[z+4] + " " + k[z+5])
+
+#Now that the lists are filled, let's strart getting rid of the misregistered contacts
+
+#1 - Pulling out blank names
+
+nomesLimpo1 = []
+dataLimpo1 = []
+cidadeLimpo1 = []
+foneLimpo1 = []
+celLimpo1 = []
+for lines in range(len(nomes)):
+    if nomes[lines] != "    ":
+        nomesLimpo1.append(nomes[lines])
+        dataLimpo1.append(data[lines])
+        cidadeLimpo1.append(cidade[lines])
+        foneLimpo1.append(fone[lines])
+        celLimpo1.append(cel[lines])
+
+#2 - Filtering Cities
+
+nomesLimpo2 = []
+dataLimpo2 = []
+cidadeLimpo2 = []
+foneLimpo2 = []
+celLimpo2 = []
+for lines in range(len(cidadeLimpo1)):
+    if cidadeLimpo1[lines] == "SAO JOSE DO RIO PRETO":
+        nomesLimpo2.append(nomesLimpo1[lines])
+        dataLimpo2.append(dataLimpo1[lines])
+        cidadeLimpo2.append(cidadeLimpo1[lines])
+        foneLimpo2.append(foneLimpo1[lines])
+        celLimpo2.append(celLimpo1[lines])
+
+#3 - Pulling out contacts without phone numbers
+
+nomesLimpo3 = []
+dataLimpo3 = []
+cidadeLimpo3 = []
+foneLimpo3 = []
+celLimpo3 = []
+for lines in range(len(foneLimpo2)):
+    if foneLimpo2[lines] != "    " or celLimpo2[lines] != "    ":
+        nomesLimpo3.append(nomesLimpo2[lines])
+        dataLimpo3.append(dataLimpo2[lines])
+        cidadeLimpo3.append(cidadeLimpo2[lines])
+        foneLimpo3.append(foneLimpo2[lines])
+        celLimpo3.append(celLimpo2[lines])
+
+#4 - There were contacts with two phone numbers, so we will unify it and give preference to the cellphone number instead of the telephone
+
+nomesLimpo4 = []
+dataLimpo4 = []
+cidadeLimpo4 = []
+celLimpo4 = []
+for lines in range(len(celLimpo3)):
+    if celLimpo3[lines] != "    ":
+        nomesLimpo4.append(nomesLimpo3[lines])
+        dataLimpo4.append(dataLimpo3[lines])
+        cidadeLimpo4.append(cidadeLimpo3[lines])
+        celLimpo4.append(celLimpo3[lines])
+    else:
+        nomesLimpo4.append(nomesLimpo3[lines])
+        dataLimpo4.append(dataLimpo3[lines])
+        cidadeLimpo4.append(cidadeLimpo3[lines])
+        celLimpo4.append(foneLimpo3[lines])
+
+#5 - Standardizing names
+
+for lines in range(len(nomesLimpo4)):
+    while nomesLimpo4[lines][0:1] == " ":
+        nomesLimpo4[lines] = nomesLimpo4[lines][1:]
+    while nomesLimpo4[lines][(len(nomesLimpo4[lines])-1):] == " ":
+        nomesLimpo4[lines] = nomesLimpo4[lines][:(len(nomesLimpo4[lines])-1)]
+
+#6 - Removing names with less than 9 characters
+
+nomesLimpo5 = []
+dataLimpo5 = []
+cidadeLimpo5 = []
+celLimpo5 = []
+for lines in range(len(nomesLimpo4)):
+    if len(nomesLimpo4[lines]) > 9:
+        nomesLimpo5.append(nomesLimpo4[lines])
+        dataLimpo5.append(dataLimpo4[lines])
+        cidadeLimpo5.append(cidadeLimpo4[lines])
+        celLimpo5.append(celLimpo4[lines])
+
+#7 - Formatting and removing miswritten phone numbers
+nomesLimpo6 = []
+dataLimpo6 = []
+cidadeLimpo6 = []
+celLimpo6 = []
+for lines in range(len(celLimpo5)):
+    while celLimpo5[lines][0:1] == " ":
+        celLimpo5[lines] = celLimpo5[lines][1:]
+    while celLimpo5[lines][(len(celLimpo5[lines])-1):] == " ":
+        celLimpo5[lines] = celLimpo5[lines][:(len(celLimpo5[lines])-1)]
+    if len(celLimpo5[lines]) == 9 or len(celLimpo5[lines]) == 11:
+        nomesLimpo6.append(nomesLimpo5[lines])
+        dataLimpo6.append(dataLimpo5[lines])
+        cidadeLimpo6.append(cidadeLimpo5[lines])
+        celLimpo6.append(celLimpo5[lines])
+
+#8 - Filtering numbers with spaces and other characters in between
+
+nomesLimpo7 = []
+dataLimpo7 = []
+cidadeLimpo7 = []
+celLimpo7 = []
+for lines in range(len(celLimpo6)):
+    marca = 0
+    for letter in range(len(celLimpo6[lines])):
+        if ord(celLimpo6[lines][letter]) < ord("0") or ord(celLimpo6[lines][letter]) > ord("9"):
+            marca = 1
+    if marca == 0:
+        nomesLimpo7.append(nomesLimpo6[lines])
+        dataLimpo7.append(dataLimpo6[lines])
+        cidadeLimpo7.append(cidadeLimpo6[lines])
+        celLimpo7.append(celLimpo6[lines])
+
+#9 - Separating numbers with DDD from those without DDD
+
+nomesLimpo8 = []
+dataLimpo8 = []
+cidadeLimpo8 = []
+celLimpo8 = []
+nomesLimpoDDD = []
+dataLimpoDDD = []
+cidadeLimpoDDD = []
+celLimpoDDD = []
+for lines in range(len(celLimpo7)):
+    if len(celLimpo7[lines]) == 9:
+        nomesLimpo8.append(nomesLimpo7[lines])
+        dataLimpo8.append(dataLimpo7[lines])
+        cidadeLimpo8.append(cidadeLimpo7[lines])
+        celLimpo8.append(celLimpo7[lines])
+    else:
+        nomesLimpoDDD.append(nomesLimpo7[lines])
+        dataLimpoDDD.append(dataLimpo7[lines])
+        cidadeLimpoDDD.append(cidadeLimpo7[lines])
+        celLimpoDDD.append(celLimpo7[lines])
+
+#10 - Saving contacts without DDD
+
+u = open("contatos_tratados_sem_DDD.txt", "w")
+for f in range(len(nomesLimpo8)):
+    u.write(nomesLimpo8[f] + ',' + dataLimpo8[f] + ',' + cidadeLimpo8[f] + ',' + celLimpo8[f] + '\n')
+u.close()
+
+10 - Saving contacts with DDD
+
+u = open("contatos_tratados_com_DDD.txt", "w")
+for f in range(len(nomesLimpoDDD)):
+    u.write(nomesLimpoDDD[f] + ',' + dataLimpoDDD[f] + ',' + cidadeLimpoDDD[f] + ',' + celLimpoDDD[f] + '\n')
+u.close()
